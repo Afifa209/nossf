@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Suchir 🐦</title>
+  <style>
+    body {
+      text-align: center;
+      background: #87CEEB;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      background: #70c5ce;
+      display: block;
+      margin: 20px auto;
+      border-radius: 12px;
+    }
+    h2 { margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Flappy Suchir 🐦</h1>
+  <canvas id="gameCanvas" width="320" height="480"></canvas>
+  <h2 id="message">Good work Suchir, you're so gay 🌈</h2>
+  <p>You got this birb 💪</p>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const messageEl = document.getElementById("message");
+
+    let frames = 0;
+    let score = 0;
+
+    // Bird
+    const bird = {
+      x: 50,
+      y: 150,
+      w: 20,
+      h: 20,
+      gravity: 0.25,
+      jump: 4.6,
+      speed: 0,
+      flap: function() {
+        this.speed = -this.jump;
+      },
+      update: function() {
+        this.speed += this.gravity;
+        this.y += this.speed;
+        if (this.y + this.h/2 >= canvas.height) {
+          this.y = canvas.height - this.h/2;
+          this.speed = 0;
+        }
+      },
+      draw: function() {
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.w/2, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    };
+
+    // Pipes
+    const pipes = [];
+    const gap = 90;
+
+    function createPipe() {
+      let top = Math.random() * (canvas.height/2);
+      pipes.push({
+        x: canvas.width,
+        y: top
+      });
+    }
+
+    function drawPipes() {
+      ctx.fillStyle = "green";
+      pipes.forEach(p => {
+        ctx.fillRect(p.x, 0, 40, p.y); // top pipe
+        ctx.fillRect(p.x, p.y + gap, 40, canvas.height); // bottom pipe
+      });
+    }
+
+    function updatePipes() {
+      if (frames % 100 === 0) createPipe();
+      pipes.forEach((p) => {
+        p.x -= 2;
+
+        // scoring
+        if (p.x + 40 === bird.x) {
+          score++;
+          showMessage(score);
+        }
+      });
+    }
+
+    function showMessage(score) {
+      switch(score) {
+        case 1:
+          messageEl.textContent = "🌈 Suchir u gay icon 🌈";
+          break;
+        case 3:
+          messageEl.textContent = "😂 Chup kar bandar baith 😂";
+          break;
+        case 5:
+          messageEl.textContent = "💀 kys 💀";
+          break;
+        case 7:
+          messageEl.textContent = "🍔 u fat a double s";
+          break;
+        case 10:
+          messageEl.textContent = "✌️ bye goodluck loser ✌️";
+          break;
+        default:
+          messageEl.textContent = "Keep going Suchir 😏";
+      }
+    }
+
+    // Controls
+    document.addEventListener("keydown", function(evt) {
+      if (evt.code === "Space") bird.flap();
+    });
+    canvas.addEventListener("click", () => bird.flap());
+
+    function draw() {
+      ctx.fillStyle = "#70c5ce";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      bird.draw();
+      drawPipes();
+
+      // Score
+      ctx.fillStyle = "black";
+      ctx.font = "20px Arial";
+      ctx.fillText("Score: " + score, 10, 25);
+    }
+
+    function update() {
+      bird.update();
+      updatePipes();
+    }
+
+    function loop() {
+      update();
+      draw();
+      frames++;
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
